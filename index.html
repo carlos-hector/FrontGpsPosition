@@ -79,6 +79,8 @@
       const divCoordenadasLista = document.getElementById("coordendas_lista");
 
       const baseUrl = "https://mongo-gps.onrender.com/posicion";
+
+      const map = L.map("map");
       //
       //Navegacion
       if (!navigator.geolocation) {
@@ -94,8 +96,8 @@
         labelLatitud.innerHTML = lat;
         lblLongitud.innerHTML = lon;
         console.log("Yao Position ", lat, lon);
-        //[-12.045914, -77.054731]
-        const map = L.map("map");
+
+        //const map = L.map("map");
         map.setView([lat, lon], 15);
         L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution:
@@ -125,10 +127,10 @@
           <label>Longitud : </label>
           <label> ${element.longitud}</label>
           <br>`;
+          L.marker([element.latitud, element.longitud], {
+            title: "cucardas",
+          }).addTo(map);
         });
-        L.marker([-12.045914, -77.054731], {
-          title: "cucardas",
-        }).addTo(map);
       });
       //escribe coordenadas
       btningresaCoordenada.addEventListener("click", async () => {
