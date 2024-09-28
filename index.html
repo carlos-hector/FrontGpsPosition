@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      main {
+        height: 100vh;
+        width: 800px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: aqua;
+      }
+      #map {
+        width: 600px;
+        height: 600px;
+      }
+    </style>
+    <title>Gps</title>
+  </head>
+  <body>
+    <main>
+      <input type="text" id="usuario" placeholder="usuario" />
+      <input type="text" id="latitud" placeholder="latitud" />
+      <input type="text" id="longitud" placeholder="longitud" />
+
+      <button id="ingresaCoordenada">INGRESAR COORDENADA</button>
+      <button id="leeCoordenada">LEER COORDENADA</button>
+
+      <label id="lblLatitud"></label>
+      <label id="lblLongitud"></label>
+
+      <div id="coordenadas_guardadas">
+        <h1>Coordenadas Leidas</h1>
+        <div id="coordendas_lista">
+          <label>Usuario : </label>
+          <label> Yao</label>
+          <label>Latitud : </label>
+          <label> 6969</label>
+          <label>Longitud : </label>
+          <label> 4242</label>
+        </div>
+      </div>
+
+      <div id="map"></div>
+    </main>
+    <script>
+      const inputUsuario = document.getElementById("usuario");
+      const inputLatitud = document.getElementById("latitud");
+      const inputLongitud = document.getElementById("longitud");
+
+      var btningresaCoordenada = document.getElementById("ingresaCoordenada");
+      var btnLeeCoordenada = document.getElementById("leeCoordenada");
+
+      const labelLatitud = document.getElementById("lblLatitud");
+      const labelLongitud = document.getElementById("lblLongitud");
+
+      const divCoordenadasLista = document.getElementById("coordendas_lista");
+
+      const baseUrl = "https://mongo-gps.onrender.com/posicion";
+      //
+      //Navegacion
+      if (!navigator.geolocation) {
+        console.log("Your browser doesnt support geolocation");
+      } else {
+        navigator.geolocation.getCurrentPosition(getPosition);
+      }
+
+      function getPosition(pos) {
+        var lat = pos.coords.latitude;
+        var lon = pos.coords.longitude;
+
+        console.log("Yao Position ", lat, lon);
+      }
+      const map = L.map("map");
+      map.setView([-12.045914, -77.054731], 15);
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+      L.marker([-12.045914, -77.054731], {
+        title: "cucardas",
+      }).addTo(map);
+      //lee coordenadas
+      btnLeeCoordenada.addEventListener("click", async () => {
+        const res = await fetch(baseUrl, {
+          method: "GET",
+        });
+        const data = await res.json();
+        console.log("Yao Coord");
+        console.log(data[0].usuario);
+        console.log(data);
+
+        divCoordenadasLista.innerHTML = "";
+        data.forEach((element) => {
+          divCoordenadasLista.innerHTML += `<label>Usuario : </label>
+          <label> ${element.usuario}</label>
+          <label>Latitud : </label>
+          <label> ${element.latitud}</label>
+          <label>Longitud : </label>
+          <label> ${element.longitud}</label>
+          <br>`;
+        });
+        L.marker([-12.045914, -77.054731], {
+          title: "cucardas",
+        }).addTo(map);
+      });
+      //escribe coordenadas
+      btningresaCoordenada.addEventListener("click", async () => {
+        if (
+          (inputUsuario != "") &
+          (inputLatitud != "") &
+          (inputLongitud != "")
+        ) {
+          const res = await fetch(baseUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              usuario: inputUsuario.value,
+              latitud: inputLatitud.value,
+              longitud: inputLongitud.value,
+            }),
+          });
+          const data = await res.json();
+          console.log("Yao escritura");
+          console.log(data);
+        }
+      });
+    </script>
+  </body>
+</html>
