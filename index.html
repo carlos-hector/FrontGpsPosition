@@ -45,7 +45,7 @@
       <button id="ingresaCoordenada">INGRESAR COORDENADA</button>
       <button id="leeCoordenada">LEER COORDENADA</button>
 
-      <button id="actualCoordenada">COORDENADA ACTUAL</button>
+      <button id="actualCoordenada">LECTURA COORDENADA</button>
 
       <label id="lblLatitud"></label>
       <label id="lblLongitud"></label>
@@ -65,13 +65,15 @@
       <div id="map"></div>
     </main>
     <script>
+      let timerId;
+
       const inputUsuario = document.getElementById("usuario");
       const inputLatitud = document.getElementById("latitud");
       const inputLongitud = document.getElementById("longitud");
 
       var btningresaCoordenada = document.getElementById("ingresaCoordenada");
       var btnLeeCoordenada = document.getElementById("leeCoordenada");
-      var btnActualCoordenada = document.getElementById("coordenadaActual");
+      var btnActualCoordenada = document.getElementById("actualCoordenada");
 
       const labelLatitud = document.getElementById("lblLatitud");
       const labelLongitud = document.getElementById("lblLongitud");
@@ -107,7 +109,20 @@
           title: "cucardas",
         }).addTo(map);
       }
-
+      //INICIA LECTURA DE POSICION CADA 1 MINUTO
+      btnActualCoordenada.addEventListener("click", () => {
+        // repetir con el intervalo de 2 segundos
+        if (!timerId) {
+          timerId = setInterval(() => grabaPosicionBBDD(), 5000);
+        } else {
+          clearInterval(timerId);
+          timerId = null;
+        }
+      });
+      function timerFunc() {
+        console.log("yao-k");
+        grabaPosicionBBDD();
+      }
       //lee coordenadas
       btnLeeCoordenada.addEventListener("click", async () => {
         const res = await fetch(baseUrl, {
@@ -133,7 +148,9 @@
         });
       });
       //escribe coordenadas
-      btningresaCoordenada.addEventListener("click", async () => {
+      btningresaCoordenada.addEventListener("click", grabaPosicionBBDD);
+
+      async function grabaPosicionBBDD() {
         if (
           (inputUsuario != "") &
           (inputLatitud != "") &
@@ -154,7 +171,7 @@
           console.log("Yao escritura");
           console.log(data);
         }
-      });
+      }
     </script>
   </body>
 </html>
