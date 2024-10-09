@@ -84,13 +84,15 @@
 
       const map = L.map("map");
       //
+      //EXCEL
+      console.log("Excel");
+      //
       //Navegacion
       if (!navigator.geolocation) {
         console.log("Your browser doesnt support geolocation");
       } else {
         navigator.geolocation.getCurrentPosition(getPosition);
       }
-
       function getPosition(pos) {
         var lat = pos.coords.latitude;
         var lon = pos.coords.longitude;
@@ -105,24 +107,49 @@
           attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
+        // L.marker([lat, lon], {
+        //   title: "cucardas",
+        // }).addTo(map);
+      }
+      async function getPosition_v2(pos) {
+        var lat = pos.coords.latitude;
+        var lon = pos.coords.longitude;
+        console.log("yao 5seg");
+        if (inputUsuario != "") {
+          const res = await fetch(baseUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              usuario: inputUsuario.value,
+              latitud: lat,
+              longitud: lon,
+            }),
+          });
+          const data = await res.json();
+          console.log("Yao escritura");
+          console.log(data);
+        }
+        //map.setView([lat, lon], 15);
+        // L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        //   attribution:
+        //     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        // }).addTo(map);
         L.marker([lat, lon], {
-          title: "cucardas",
+          title: "actual",
         }).addTo(map);
       }
       //INICIA LECTURA DE POSICION CADA 1 MINUTO
       btnActualCoordenada.addEventListener("click", () => {
         // repetir con el intervalo de 2 segundos
         if (!timerId) {
-          timerId = setInterval(() => grabaPosicionBBDD(), 5000);
+          timerId = setInterval(() => grabaPosicionBBDD_v2(), 5000);
         } else {
           clearInterval(timerId);
           timerId = null;
         }
       });
-      function timerFunc() {
-        console.log("yao-k");
-        grabaPosicionBBDD();
-      }
       //lee coordenadas
       btnLeeCoordenada.addEventListener("click", async () => {
         const res = await fetch(baseUrl, {
@@ -151,11 +178,7 @@
       btningresaCoordenada.addEventListener("click", grabaPosicionBBDD);
 
       async function grabaPosicionBBDD() {
-        if (
-          (inputUsuario != "") &
-          (inputLatitud != "") &
-          (inputLongitud != "")
-        ) {
+        if (inputUsuario != "") {
           const res = await fetch(baseUrl, {
             method: "POST",
             headers: {
@@ -171,6 +194,9 @@
           console.log("Yao escritura");
           console.log(data);
         }
+      }
+      async function grabaPosicionBBDD_v2() {
+        navigator.geolocation.getCurrentPosition(getPosition_v2);
       }
     </script>
   </body>
